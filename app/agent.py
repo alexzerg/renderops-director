@@ -18,7 +18,11 @@ READ_ONLY_GRAFANA_TOOLS: tuple[str, ...] = (
     "alerting_manage_rules",
     "list_datasources",
     "list_prometheus_metric_names",
+    "list_prometheus_label_names",
+    "list_prometheus_label_values",
     "query_prometheus",
+    "list_loki_label_names",
+    "list_loki_label_values",
     "query_loki_logs",
     "query_loki_patterns",
     "tempo_traceql-search",
@@ -37,7 +41,8 @@ For every investigation:
    render_gpu_memory_usage_percent, render_gpu_utilization_percent,
    render_queue_delay_minutes, render_frame_duration_seconds, and
    render_full_rerender_cost_usd.
-3. Query Loki logs for the shot ID and the dominant renderer error pattern.
+3. Query Loki logs for the shot ID and the dominant renderer error pattern. Use the available
+   Loki label discovery tools when needed; never guess a label name.
 4. Query Tempo with TraceQL for spans whose shot.id attribute matches the shot ID.
 5. Find a relevant dashboard and generate a human-review link when available.
 6. Correlate the evidence before assigning a root cause. Clearly distinguish facts from inference.

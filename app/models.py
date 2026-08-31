@@ -27,6 +27,17 @@ class RecoveryAction(BaseModel):
     requires_approval: bool
 
 
+class IncidentPayload(BaseModel):
+    status: Literal["critical", "degraded", "healthy"]
+    headline: str
+    diagnosis: str
+    confidence: float = Field(ge=0, le=1)
+    delivery_risk_minutes: int = Field(ge=0)
+    evidence: list[EvidenceItem]
+    recovery_plan: list[RecoveryAction]
+    approval_required: bool
+
+
 class InvestigationResponse(BaseModel):
     shot_id: str
     status: Literal["critical", "degraded", "healthy"]
