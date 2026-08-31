@@ -47,6 +47,7 @@
             <button type="button" class="preview-tab" data-mode="source">Original plate</button>
             <button type="button" class="preview-tab active" data-mode="failed">Failed render</button>
             <button type="button" class="preview-tab" data-mode="canary">Canary fix</button>
+            <button type="button" class="preview-tab locked" id="recoveredTab" data-mode="recovered" disabled>Recovered shot</button>
           </div>
           <div class="preview-caption">
             <strong id="previewTitle">What the failure looks like</strong>
@@ -135,6 +136,45 @@
         </div>
         <button type="button" id="previewFixButton" class="preview-fix-button">Watch proposed canary <b>→</b></button>
       </div>
+      <section id="recoveryWorkflow" class="recovery-workflow hidden">
+        <div class="workflow-heading">
+          <div>
+            <span>APPROVAL-GATED RECOVERY</span>
+            <h3>Prove the fix through Grafana.</h3>
+            <p>The render jobs are simulated; OTLP ingestion and Prometheus, Loki, and Tempo verification are live.</p>
+          </div>
+          <strong>GRAFANA CLOUD · LIVE</strong>
+        </div>
+        <div class="workflow-steps">
+          <div class="workflow-step complete" id="investigationStep">
+            <i>1</i><div><small>INVESTIGATION</small><strong>Root cause found</strong><p>Asset v47 · CUDA OOM · 38 frames</p></div><b>✓</b>
+          </div>
+          <div class="workflow-step ready" id="canaryStep">
+            <i>2</i><div><small>CANARY</small><strong>Awaiting approval</strong><p>Render five frames with safe asset config</p></div>
+            <button type="button" id="approveCanaryButton">Approve canary</button>
+          </div>
+          <div class="workflow-step locked" id="recoveryStep">
+            <i>3</i><div><small>RECOVERY</small><strong>Locked</strong><p>Requires a Grafana-validated canary</p></div>
+            <button type="button" id="approveRecoveryButton" disabled>Approve 38 frames</button>
+          </div>
+        </div>
+        <div id="phaseVerification" class="phase-verification hidden">
+          <div class="phase-result-head"><span id="phaseStatus">VALIDATED</span><strong id="phaseHeadline"></strong></div>
+          <div class="verification-kpis">
+            <div><small>GPU MEMORY</small><strong id="phaseGpu">96% → 72%</strong></div>
+            <div><small>FRAMES</small><strong id="phaseFrames">5 / 5</strong></div>
+            <div><small>CONFIDENCE</small><strong id="phaseConfidence">98%</strong></div>
+          </div>
+          <div class="grafana-checks">
+            <div><span class="grafana-dot prometheus"></span><strong>Prometheus</strong><p id="prometheusCheck"></p></div>
+            <div><span class="grafana-dot loki"></span><strong>Loki</strong><p id="lokiCheck"></p></div>
+            <div><span class="grafana-dot tempo"></span><strong>Tempo</strong><p id="tempoCheck"></p></div>
+          </div>
+          <p id="phaseSummary" class="phase-summary"></p>
+          <div class="phase-next"><small>NEXT ACTION</small><strong id="phaseNext"></strong></div>
+        </div>
+      </section>
+
       <details>
         <summary>Runtime evidence</summary>
         <ul id="tools"></ul>

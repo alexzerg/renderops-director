@@ -70,6 +70,6 @@
   <rect x="70" y="735" width="1470" height="92" rx="20" fill="#111521" stroke="#303646"/>
   <text x="105" y="773" class="eyebrow">TRUST BOUNDARY</text>
   <text x="105" y="804" class="p">Synthetic cinematic telemetry · live ingestion and queries</text>
-  <text x="555" y="804" class="p">Separate OTLP writer and MCP reader credentials</text>
+  <text x="515" y="804" class="p">Approve → Canary → Grafana verify → 38-frame recovery</text>
   <text x="1035" y="804" class="p">No write tools · supervisor owns mutations</text>
 </svg>

@@ -15,10 +15,13 @@
    - avoided cost `$150.50 · 81%`;
    - exactly three recovery actions;
    - a human approval requirement.
-7. Open **Runtime evidence** and verify MCP tool names such as:
-   - `query_prometheus`;
-   - `query_loki_logs`;
-   - `tempo_traceql-search`.
+7. Click **Approve canary** and verify:
+   - `5 / 5` frames;
+   - GPU memory `96% → 72%`;
+   - successful Prometheus, Loki, and Tempo checks;
+   - the 38-frame recovery becomes enabled.
+8. Click **Approve 38 frames** and verify `38 / 38`, `EDITORIAL READY`, and the recovered video.
+9. Open **Runtime evidence** and verify MCP tool names such as `query_prometheus`, `query_loki_logs`, and `tempo_traceql-search`.
 
 The cinematic telemetry is synthetic and reproducible. The OTLP ingestion, Grafana Cloud storage, official MCP queries, Gemini reasoning, and HTTP response are live.
 
@@ -33,7 +36,7 @@ Expected indicators:
 ```json
 {
   "status": "ok",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "agent_runtime": "live",
   "grafana_transport": "stdio"
 }

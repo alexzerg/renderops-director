@@ -17,6 +17,16 @@ failed-frame timeline, and a recovered five-frame canary. Visitors can switch be
 media states before running the live Grafana investigation. The footage is original and generated
 procedurally for this reproducible demo; it is not third-party studio material.
 
+## Approval-gated recovery loop
+
+After diagnosis, the operator approves a five-frame canary. The application emits a new canary
+render phase through Grafana Cloud OTLP, then verifies the result through Prometheus, Loki, and Tempo
+MCP calls. Only a validated canary unlocks the 38-frame recovery. A second live verification marks
+the final shot editorial ready and unlocks the recovered media preview.
+
+The render jobs are simulated for reproducibility; the telemetry ingestion, Grafana storage, MCP
+queries, Gemini verification narrative, approval gates, and UI state transitions are live.
+
 ## Outcome
 
 When a shot starts missing its production deadline, the agent answers:

@@ -12,8 +12,11 @@ def _text_content(result: Any) -> str:
     return " ".join(getattr(item, "text", "") for item in result.content)[:6000]
 
 
-async def collect_grafana_evidence(shot_id: str) -> tuple[list[str], list[dict[str, str]]]:
-    """Query the same official read-only MCP server with a bounded deterministic plan."""
+async def collect_grafana_evidence(
+    shot_id: str,
+    phase: str = "failure",
+) -> tuple[list[str], list[dict[str, str]]]:
+    """Query the same official read-only MCP server for one render phase."""
     grafana_url = os.environ.get("GRAFANA_URL", "").strip()
     token = os.environ.get("GRAFANA_SERVICE_ACCOUNT_TOKEN", "").strip()
     if not grafana_url or not token:
@@ -31,15 +34,32 @@ async def collect_grafana_evidence(shot_id: str) -> tuple[list[str], list[dict[s
     loki_uid = os.environ.get("GRAFANA_LOKI_UID", "grafanacloud-logs")
     tempo_uid = os.environ.get("GRAFANA_TEMPO_UID", "grafanacloud-traces")
     normalized = shot_id.strip().upper()
-    metric_queries = (
+    if phase not in {"failure", "canary", "recovery"}:
+        raise ValueError(f"Unsupported MCP evidence phase: {phase}")
+    metric_names = [
+        "render_frames_total",
         "render_frames_failed",
         "render_gpu_memory_usage_percent",
         "render_gpu_utilization_percent",
         "render_queue_delay_minutes",
-        "render_full_rerender_cost_usd_ratio",
-        "render_failed_frames_cost_usd_ratio",
-        "render_canary_cost_usd_ratio",
-    )
+    ]
+    if phase == "failure":
+        metric_names.extend(
+            [
+                "render_full_rerender_cost_usd_ratio",
+                "render_failed_frames_cost_usd_ratio",
+                "render_canary_cost_usd_ratio",
+            ]
+        )
+    metric_queries = [
+        f'{name}{{recovery_phase="{phase}"}}'
+        for name in metric_names
+    ]
+    log_phrase = {
+        "failure": "CUDA out of memory",
+        "canary": "Canary render completed",
+        "recovery": "Recovery rerender completed",
+    }[phase]
     calls = tuple(
         (
             "query_prometheus",
@@ -56,7 +76,7 @@ async def collect_grafana_evidence(shot_id: str) -> tuple[list[str], list[dict[s
             "query_loki_logs",
             {
                 "datasourceUid": loki_uid,
-                "logql": '{service_name="render-worker"} |= "CUDA out of memory"',
+                "logql": f'{{service_name="render-worker"}} |= "{log_phrase}"',
                 "startRfc3339": "now-2h",
                 "endRfc3339": "now",
                 "limit": 20,
@@ -69,7 +89,8 @@ async def collect_grafana_evidence(shot_id: str) -> tuple[list[str], list[dict[s
                 "datasourceUid": tempo_uid,
                 "query": (
                     '{ resource.service.name = "render-worker" && '
-                    f'span.shot.id = "{normalized}" }}'
+                    f'span.shot.id = "{normalized}" && '
+                    f'span.recovery.phase = "{phase}" }}'
                 ),
             },
         ),

@@ -31,3 +31,15 @@ def test_otlp_config_builds_basic_auth_without_exposing_token(
     assert endpoint == "https://otlp.example/otlp"
     assert headers["Authorization"].startswith("Basic ")
     assert "glc_example" not in headers["Authorization"]
+
+
+def test_render_scenarios_have_expected_closed_loop_values() -> None:
+    from app.telemetry import SCENARIOS
+
+    assert SCENARIOS["failure"]["frames_failed"] == 38
+    assert SCENARIOS["failure"]["gpu_memory"] == 96
+    assert SCENARIOS["canary"]["frames_total"] == 5
+    assert SCENARIOS["canary"]["frames_failed"] == 0
+    assert SCENARIOS["canary"]["gpu_memory"] == 72
+    assert SCENARIOS["recovery"]["frames_total"] == 38
+    assert SCENARIOS["recovery"]["frames_failed"] == 0

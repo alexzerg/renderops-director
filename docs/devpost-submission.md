@@ -26,7 +26,10 @@ An operator then enters a shot ID and production objective. RenderOps Director:
 4. retrieves Prometheus metrics, Loki logs, Tempo traces, alerts, and dashboard context;
 5. correlates failed frames, GPU pressure, renderer errors, asset versions, retries, queue delay, and rerender cost;
 6. compares a full rerender, failed-frame-only rerender, and five-frame canary;
-7. returns an evidence-backed recovery plan with confidence, owners, delivery risk, and explicit human approval gates.
+7. returns an evidence-backed recovery plan with confidence, owners, delivery risk, and explicit human approval gates;
+8. executes an approved five-frame canary and emits a new canary telemetry phase;
+9. verifies 5/5 frames, zero failures, stable VRAM, a Loki success event, and a Tempo trace before unlocking the 38-frame recovery;
+10. verifies the final 38/38 rerender and marks the recovered shot editorial ready.
 
 For the public SH-042 scenario, it recommends a $4.20 canary followed by a $31.70 failed-frame-only rerender: $35.90 instead of a $186.40 full rerender, avoiding $150.50 (about 81%).
 

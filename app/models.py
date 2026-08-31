@@ -57,3 +57,30 @@ class InvestigationResponse(BaseModel):
     agent_narrative: str
     tools_used: list[str]
     approval_required: bool
+
+
+class RecoveryRequest(BaseModel):
+    shot_id: str = Field(default="SH-042", min_length=2, max_length=64)
+
+
+class PhaseNarrative(BaseModel):
+    summary: str
+    next_action: str
+    confidence: float = Field(ge=0, le=1)
+
+
+class PhaseVerificationResponse(BaseModel):
+    shot_id: str
+    phase: Literal["canary", "recovery"]
+    status: Literal["validated", "completed", "failed"]
+    headline: str
+    frames_processed: int = Field(ge=0)
+    frames_failed: int = Field(ge=0)
+    gpu_memory_before_percent: float = Field(ge=0, le=100)
+    gpu_memory_after_percent: float = Field(ge=0, le=100)
+    verification_checks: list[str]
+    summary: str
+    next_action: str
+    confidence: float = Field(ge=0, le=1)
+    tools_used: list[str]
+    approval_required: bool
