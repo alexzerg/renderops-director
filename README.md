@@ -6,7 +6,7 @@ RenderOps Director is a new submission for the **Agentic Cinema — Grafana trac
 
 **Live demo:** <https://renderops-director-w6mw3t2ita-uc.a.run.app>
 
-The public deployment currently runs the clearly labelled deterministic demo dataset. The same container includes Google ADK and official `mcp-grafana`; live mode is enabled only after a least-privilege Grafana service-account token is attached through Secret Manager.
+The public deployment runs live Google ADK, Gemini on Vertex AI, and official `mcp-grafana`. Before each investigation, a bounded OpenTelemetry scenario sends fresh render metrics, logs, and traces to Grafana Cloud. Gemini then retrieves those signals through read-only MCP calls and prepares the recovery decision.
 
 ## Outcome
 
@@ -84,6 +84,21 @@ export GRAFANA_URL=https://YOUR-STACK.grafana.net
 export GRAFANA_SERVICE_ACCOUNT_TOKEN='set-from-secret-manager'
 uvicorn app.main:app
 ```
+
+## Seed production-shaped telemetry
+
+The optional seeder emits a bounded shot incident through Grafana Cloud OTLP: nine render metrics,
+structured CUDA OOM logs, and a failed denoiser trace. Credentials stay in Secret Manager.
+
+```bash
+export RENDEROPS_SEED_TELEMETRY=true
+export GRAFANA_OTLP_ENDPOINT=https://YOUR-OTLP-GATEWAY.grafana.net/otlp
+export GRAFANA_OTLP_INSTANCE_ID=YOUR_OTLP_INSTANCE_ID
+export GRAFANA_OTLP_TOKEN='set-from-secret-manager'
+```
+
+This is synthetic domain telemetry, but the ingestion, Grafana storage, MCP queries, Gemini reasoning,
+and public response path are all live.
 
 ## Verify
 

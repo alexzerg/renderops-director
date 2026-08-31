@@ -6,4 +6,4 @@
 - [x] Provision Google Cloud project
 - [x] Deploy Cloud Run service
 - [x] Publish public GitHub repository
-- [ ] Connect live Grafana Cloud credentials
+- [x] Connect live Grafana Cloud metrics, logs, and traces through MCP
