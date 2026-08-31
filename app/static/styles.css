@@ -176,7 +176,7 @@ footer { display: flex; justify-content: space-between; padding: 40px 0 32px; bo
 .workflow-heading p { max-width: 680px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .workflow-heading > strong { flex: 0 0 auto; padding: 9px 12px; color: #ff9c68; border: 1px solid rgba(255,107,53,.38); background: rgba(255,107,53,.08); font: 750 9px/1 ui-monospace,monospace; letter-spacing: .12em; }
 .workflow-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 20px; }
-.workflow-step { position: relative; min-height: 165px; padding: 18px; border: 1px solid var(--line); background: #131824; }
+.workflow-step { position: relative; display: flex; flex-direction: column; min-height: 210px; padding: 18px; border: 1px solid var(--line); background: #131824; }
 .workflow-step > i { display: grid; place-items: center; width: 29px; height: 29px; margin-bottom: 20px; border-radius: 50%; background: #252c3c; color: #aab1c0; font: 800 11px/1 ui-monospace,monospace; font-style: normal; }
 .workflow-step small { display: block; color: var(--muted); font: 700 8px/1 ui-monospace,monospace; letter-spacing: .14em; }
 .workflow-step strong { display: block; margin-top: 7px; font-size: 15px; }
@@ -186,8 +186,10 @@ footer { display: flex; justify-content: space-between; padding: 40px 0 32px; bo
 .workflow-step.ready { border-color: rgba(255,181,71,.38); }.workflow-step.ready > i { color: #211303; background: var(--amber); }
 .workflow-step.validated { border-color: rgba(100,217,139,.48); }.workflow-step.validated > i { color: #07150c; background: var(--green); }
 .workflow-step.locked { opacity: .58; }.workflow-step.running { border-color: rgba(87,212,212,.55); box-shadow: inset 0 0 25px rgba(87,212,212,.05); }
-.workflow-step button { position: absolute; left: 18px; right: 18px; bottom: 16px; min-height: 36px; justify-content: center; padding: 0 12px; font-size: 11px; }
+.workflow-step > div { padding-bottom: 16px; }
+.workflow-step button { position: static; width: 100%; min-height: 36px; margin-top: auto; justify-content: center; padding: 0 12px; font-size: 11px; }
 .workflow-step button:disabled { background: #2a303d; color: #6d7585; }
+.workflow-step.validated button { color: #7ee8a2; background: rgba(100,217,139,.1); border: 1px solid rgba(100,217,139,.35); }
 .phase-verification { margin-top: 14px; padding: 22px; border: 1px solid rgba(100,217,139,.32); background: rgba(5,20,13,.44); }
 .phase-verification.failed { border-color: rgba(255,77,94,.4); background: rgba(35,7,12,.38); }
 .phase-result-head { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
