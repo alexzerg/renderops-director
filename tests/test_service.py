@@ -97,3 +97,21 @@ def test_normalizer_builds_structured_live_response() -> None:
     assert len(response.recovery_plan) == 3
     assert response.tools_used == ["query_prometheus", "gemini_structured_normalizer"]
     fake_client.close.assert_called_once_with()
+
+
+def test_collector_fallback_never_returns_empty_ui() -> None:
+    from app.service import _collector_fallback_response
+
+    response = _collector_fallback_response(
+        "SH-042",
+        ["query_prometheus", "query_loki_logs", "tempo_traceql-search"],
+        [
+            {"tool": "query_prometheus", "response": "render_frames_failed=38"},
+            {"tool": "query_loki_logs", "response": "CUDA out of memory"},
+            {"tool": "tempo_traceql-search", "response": "denoise.final-pass failed"},
+        ],
+    )
+    assert len(response.evidence) == 3
+    assert len(response.recovery_plan) == 3
+    assert "mcp_direct_collector" in response.tools_used
+    assert response.agent_narrative != "No final response received."
