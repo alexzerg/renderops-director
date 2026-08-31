@@ -10,6 +10,13 @@ rerender, avoiding $150.50 (about 81%) while protecting the editorial deadline.
 
 The public deployment runs live Google ADK, Gemini on Vertex AI, and official `mcp-grafana`. Before each investigation, a bounded OpenTelemetry scenario sends fresh render metrics, logs, and traces to Grafana Cloud. Gemini then retrieves those signals through read-only MCP calls and prepares the recovery decision.
 
+## Tangible shot preview
+
+The public UI includes an original synthetic VFX shot, a visibly damaged final-denoise render, a
+failed-frame timeline, and a recovered five-frame canary. Visitors can switch between all three
+media states before running the live Grafana investigation. The footage is original and generated
+procedurally for this reproducible demo; it is not third-party studio material.
+
 ## Outcome
 
 When a shot starts missing its production deadline, the agent answers:

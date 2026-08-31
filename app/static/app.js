@@ -6,6 +6,50 @@ const errorBox = document.querySelector('#error');
 const progressBar = document.querySelector('#progressBar');
 const progressLabel = document.querySelector('#progressLabel');
 const steps = [...document.querySelectorAll('.steps span')];
+const shotVideo = document.querySelector('#shotVideo');
+const previewStatus = document.querySelector('#previewStatus');
+const previewTitle = document.querySelector('#previewTitle');
+const previewDescription = document.querySelector('#previewDescription');
+const previewTabs = [...document.querySelectorAll('.preview-tab')];
+
+const previewModes = {
+  source: {
+    src: '/static/media/shot-sh042-source.webm',
+    poster: '/static/media/shot-sh042-source.jpg',
+    status: 'ORIGINAL PLATE',
+    title: 'The intended cinematic shot',
+    description: 'The clean source plate contains the composition, camera move, rain, lighting, and cargo tram before final-denoise processing.',
+  },
+  failed: {
+    src: '/static/media/shot-sh042-failed.webm',
+    poster: '/static/media/shot-sh042-failed.jpg',
+    status: 'FAILED RENDER',
+    title: 'What the failure looks like',
+    description: 'Final-denoise tiles disappear, temporal noise spikes, and several frames become unusable for editorial review.',
+  },
+  canary: {
+    src: '/static/media/shot-sh042-canary.webm',
+    poster: '/static/media/shot-sh042-canary.jpg',
+    status: 'CANARY PASS',
+    title: 'What the proposed fix restores',
+    description: 'The five-frame canary uses the safe asset configuration, restores stable denoise output, and keeps GPU memory below the failure threshold.',
+  },
+};
+
+function setPreviewMode(mode) {
+  const selected = previewModes[mode];
+  if (!selected) return;
+  shotVideo.pause();
+  shotVideo.src = selected.src;
+  shotVideo.poster = selected.poster;
+  shotVideo.load();
+  shotVideo.play().catch(() => {});
+  previewStatus.textContent = selected.status;
+  previewStatus.className = `viewer-status-pill ${mode}`;
+  previewTitle.textContent = selected.title;
+  previewDescription.textContent = selected.description;
+  previewTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
+}
 
 const phases = [
   ['Reading active alerts', 18],
@@ -115,4 +159,14 @@ form.addEventListener('submit', async event => {
   }
 });
 
+previewTabs.forEach(tab => {
+  tab.addEventListener('click', () => setPreviewMode(tab.dataset.mode));
+});
+
+document.querySelector('#previewFixButton').addEventListener('click', () => {
+  setPreviewMode('canary');
+  document.querySelector('#shotPreview').scrollIntoView({behavior: 'smooth', block: 'start'});
+});
+
+shotVideo.play().catch(() => {});
 loadHealth();

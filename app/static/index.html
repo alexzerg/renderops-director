@@ -24,6 +24,62 @@
       <p>RenderOps Director correlates alerts, GPU metrics, renderer logs, and traces into one human-approved recovery decision.</p>
     </section>
 
+    <section id="shotPreview" class="shot-preview">
+      <div class="preview-heading">
+        <div>
+          <div class="eyebrow">SHOT PREVIEW · SQ12 / SH-042</div>
+          <h2>See the broken shot before diagnosing it.</h2>
+          <p>Switch between the original plate, the failed final-denoise render, and the five-frame recovery canary.</p>
+        </div>
+        <span class="synthetic-badge">ORIGINAL SYNTHETIC VFX SHOT</span>
+      </div>
+      <div class="preview-layout">
+        <div class="viewer-shell">
+          <div class="viewer-status">
+            <span id="previewStatus" class="viewer-status-pill failed">FAILED RENDER</span>
+            <span id="previewTimecode">00:00:03:12</span>
+          </div>
+          <video id="shotVideo" muted loop playsinline controls preload="metadata" poster="/static/media/shot-sh042-failed.jpg">
+            <source src="/static/media/shot-sh042-failed.webm" type="video/webm">
+            <source src="/static/media/shot-sh042-failed.mp4" type="video/mp4">
+          </video>
+          <div class="preview-tabs" role="tablist" aria-label="Shot preview mode">
+            <button type="button" class="preview-tab" data-mode="source">Original plate</button>
+            <button type="button" class="preview-tab active" data-mode="failed">Failed render</button>
+            <button type="button" class="preview-tab" data-mode="canary">Canary fix</button>
+          </div>
+          <div class="preview-caption">
+            <strong id="previewTitle">What the failure looks like</strong>
+            <p id="previewDescription">Final-denoise tiles disappear, temporal noise spikes, and several frames become unusable for editorial review.</p>
+          </div>
+        </div>
+        <aside class="shot-context">
+          <div class="context-label">FRAME RANGE 1038–1079</div>
+          <div class="frame-strip" aria-label="Failed frame timeline">
+            <span class="frame ok"><b>1038</b></span>
+            <span class="frame ok"><b>1040</b></span>
+            <span class="frame failed"><b>1042</b></span>
+            <span class="frame failed"><b>1047</b></span>
+            <span class="frame failed"><b>1051</b></span>
+            <span class="frame queued"><b>1058</b></span>
+            <span class="frame failed"><b>1063</b></span>
+            <span class="frame queued"><b>1068</b></span>
+          </div>
+          <div class="frame-legend"><span><i class="ok"></i>Rendered</span><span><i class="failed"></i>Failed</span><span><i class="queued"></i>At risk</span></div>
+          <div class="problem-card">
+            <span>VISIBLE PROBLEM</span>
+            <h3>The shot cannot enter editorial review.</h3>
+            <p>38 final frames contain missing denoise tiles, black flashes, or unstable noise. Replaying the source plate does not fix the final render.</p>
+          </div>
+          <div class="problem-facts">
+            <div><small>FAILED</small><strong>38 / 240</strong></div>
+            <div><small>RENDER PASS</small><strong>Denoise final</strong></div>
+            <div><small>ASSET CHANGE</small><strong>Texture v47</strong></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
     <section class="mission-panel">
       <form id="investigationForm">
         <label>
@@ -73,8 +129,11 @@
       </div>
 
       <div class="director-note">
-        <span>DIRECTOR'S CALL</span>
-        <p id="narrative"></p>
+        <div>
+          <span>DIRECTOR'S CALL</span>
+          <p id="narrative"></p>
+        </div>
+        <button type="button" id="previewFixButton" class="preview-fix-button">Watch proposed canary <b>→</b></button>
       </div>
       <details>
         <summary>Runtime evidence</summary>

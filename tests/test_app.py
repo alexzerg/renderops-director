@@ -19,6 +19,9 @@ def test_home_page() -> None:
     assert response.status_code == 200
     assert "RenderOps Director" in response.text
     assert "Investigate shot" in response.text
+    assert "Original plate" in response.text
+    assert "Failed render" in response.text
+    assert "Canary fix" in response.text
 
 
 def test_demo_investigation() -> None:

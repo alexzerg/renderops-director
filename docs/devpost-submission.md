@@ -16,7 +16,9 @@ Most monitoring products stop at a red dashboard. We wanted an agent that answer
 
 ## What it does
 
-An operator enters a shot ID and production objective. RenderOps Director then:
+Before running the investigation, the operator can watch the original shot plate, the visibly damaged final-denoise render, and the recovered five-frame canary. A frame timeline identifies exactly where the shot becomes unusable.
+
+An operator then enters a shot ID and production objective. RenderOps Director:
 
 1. sends a bounded, clearly labelled cinematic incident through the real Grafana Cloud OTLP endpoint;
 2. invokes Gemini through Google Agent Development Kit on Vertex AI;
