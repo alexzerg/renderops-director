@@ -204,3 +204,16 @@ footer { display: flex; justify-content: space-between; padding: 40px 0 32px; bo
 .phase-summary { color: #c8cdd7; line-height: 1.55; font-size: 13px; }
 .phase-next { padding: 15px 17px; border-left: 3px solid var(--orange); background: rgba(255,107,53,.06); }.phase-next strong { display: block; margin-top: 7px; font-size: 13px; }
 @media(max-width:800px){.workflow-steps,.grafana-checks{grid-template-columns:1fr}.verification-kpis{grid-template-columns:1fr}.verification-kpis>div+div{padding-left:0;border-left:0;border-top:1px solid var(--line)}.workflow-heading{flex-direction:column}}
+
+/* Silent custom video transport and explicit failure windows */
+.viewer-shell video { cursor: pointer; }
+.artifact-indicator { position: absolute; z-index: 3; top: 94px; left: 14px; padding: 9px 11px; color: #fff; background: rgba(128,8,24,.88); border: 1px solid rgba(255,77,94,.7); font: 800 9px/1 ui-monospace,monospace; letter-spacing: .12em; pointer-events: none; }
+.artifact-indicator i { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 10px var(--red); }
+.video-transport { display: grid; grid-template-columns: 70px minmax(100px,1fr) 88px; align-items: center; gap: 13px; min-height: 48px; padding: 0 16px; background: #090d14; border-top: 1px solid var(--line); }
+.video-toggle { min-height: 29px; justify-content: center; padding: 0 9px; border: 1px solid var(--line); background: #1b2230; color: #d9dde5; font: 750 9px/1 ui-monospace,monospace; text-transform: uppercase; letter-spacing: .08em; }
+.video-track { position: relative; height: 5px; cursor: pointer; background: #313848; overflow: visible; }
+.video-track > i { position: absolute; z-index: 2; inset: 0 auto 0 0; width: 0; background: var(--orange); pointer-events: none; }
+.failure-window { position: absolute; z-index: 1; top: -5px; height: 15px; background: rgba(255,77,94,.7); border-inline: 1px solid #ff8290; pointer-events: none; }
+.video-track.no-failures .failure-window { display: none; }
+#videoClock { color: #8d94a7; font: 650 9px/1 ui-monospace,monospace; text-align: right; }
+@media(max-width:540px){.video-transport{grid-template-columns:60px 1fr 72px;padding:0 9px;gap:8px}.video-toggle{font-size:8px}}

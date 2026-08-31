@@ -19,6 +19,14 @@ const canaryStep = document.querySelector('#canaryStep');
 const recoveryStep = document.querySelector('#recoveryStep');
 const canaryTab = document.querySelector('#canaryTab');
 const recoveredTab = document.querySelector('#recoveredTab');
+const videoToggle = document.querySelector('#videoToggle');
+const videoTrack = document.querySelector('#videoTrack');
+const videoProgress = document.querySelector('#videoProgress');
+const videoClock = document.querySelector('#videoClock');
+const previewTimecode = document.querySelector('#previewTimecode');
+const artifactIndicator = document.querySelector('#artifactIndicator');
+let activePreviewMode = 'failed';
+const failedWindows = [[1.2, 1.72], [3.35, 4.15], [6.1, 6.58]];
 
 const previewModes = {
   source: {
@@ -64,6 +72,31 @@ function setPreviewMode(mode) {
   previewTitle.textContent = selected.title;
   previewDescription.textContent = selected.description;
   previewTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
+  activePreviewMode = mode;
+  videoTrack.classList.toggle('no-failures', mode !== 'failed');
+  artifactIndicator.classList.add('hidden');
+}
+
+function formatClock(seconds) {
+  const safe = Number.isFinite(seconds) ? seconds : 0;
+  return `00:${String(Math.floor(safe)).padStart(2, '0')}`;
+}
+
+function updateVideoTransport() {
+  const duration = Number.isFinite(shotVideo.duration) ? shotVideo.duration : 8;
+  const current = Number.isFinite(shotVideo.currentTime) ? shotVideo.currentTime : 0;
+  videoProgress.style.width = `${Math.min(100, current / duration * 100)}%`;
+  videoClock.textContent = `${formatClock(current)} / ${formatClock(duration)}`;
+  const frame = Math.floor(current * 30);
+  previewTimecode.textContent = `00:00:${String(Math.floor(current)).padStart(2, '0')}:${String(frame % 30).padStart(2, '0')}`;
+  const failureActive = activePreviewMode === 'failed'
+    && failedWindows.some(([start, end]) => current >= start && current <= end);
+  artifactIndicator.classList.toggle('hidden', !failureActive);
+}
+
+function toggleVideoPlayback() {
+  if (shotVideo.paused) shotVideo.play().catch(() => {});
+  else shotVideo.pause();
 }
 
 const phases = [
@@ -280,6 +313,18 @@ document.querySelector('#previewFixButton').addEventListener('click', () => {
 
 approveCanaryButton.addEventListener('click', () => runRecoveryPhase('canary'));
 approveRecoveryButton.addEventListener('click', () => runRecoveryPhase('recovery'));
+videoToggle.addEventListener('click', toggleVideoPlayback);
+shotVideo.addEventListener('click', toggleVideoPlayback);
+shotVideo.addEventListener('timeupdate', updateVideoTransport);
+shotVideo.addEventListener('loadedmetadata', updateVideoTransport);
+shotVideo.addEventListener('play', () => { videoToggle.textContent = 'Pause'; });
+shotVideo.addEventListener('pause', () => { videoToggle.textContent = 'Play'; });
+videoTrack.addEventListener('click', event => {
+  const bounds = videoTrack.getBoundingClientRect();
+  const ratio = Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width));
+  if (Number.isFinite(shotVideo.duration)) shotVideo.currentTime = ratio * shotVideo.duration;
+});
 
+videoTrack.classList.remove('no-failures');
 shotVideo.play().catch(() => {});
 loadHealth();

@@ -39,10 +39,21 @@
             <span id="previewStatus" class="viewer-status-pill failed">FAILED RENDER</span>
             <span id="previewTimecode">00:00:03:12</span>
           </div>
-          <video id="shotVideo" muted loop playsinline controls preload="metadata" poster="/static/media/shot-sh042-failed.jpg">
+          <video id="shotVideo" muted loop playsinline preload="metadata" poster="/static/media/shot-sh042-failed.jpg">
             <source src="/static/media/shot-sh042-failed.webm" type="video/webm">
             <source src="/static/media/shot-sh042-failed.mp4" type="video/mp4">
           </video>
+          <div id="artifactIndicator" class="artifact-indicator hidden"><i></i> FRAME FAILURE ACTIVE</div>
+          <div class="video-transport">
+            <button type="button" id="videoToggle" class="video-toggle">Pause</button>
+            <div id="videoTrack" class="video-track" aria-label="Video timeline">
+              <i id="videoProgress"></i>
+              <span class="failure-window" style="left:15%;width:7%"></span>
+              <span class="failure-window" style="left:42%;width:10%"></span>
+              <span class="failure-window" style="left:76%;width:7%"></span>
+            </div>
+            <span id="videoClock">00:00 / 00:08</span>
+          </div>
           <div class="preview-tabs" role="tablist" aria-label="Shot preview mode">
             <button type="button" class="preview-tab" data-mode="source">Original plate</button>
             <button type="button" class="preview-tab active" data-mode="failed">Failed render</button>

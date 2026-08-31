@@ -22,6 +22,9 @@ def test_home_page() -> None:
     assert "Original plate" in response.text
     assert "Failed render" in response.text
     assert "Canary fix" in response.text
+    assert 'id="videoToggle"' in response.text
+    assert 'id="artifactIndicator"' in response.text
+    assert "playsinline controls" not in response.text
 
 
 def test_demo_investigation() -> None:
