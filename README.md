@@ -1,0 +1,124 @@
+# RenderOps Director
+
+**A Gemini production coordinator that turns failed cinematic frames into the safest, fastest, and most cost-effective recovery decision.**
+
+RenderOps Director is a new submission for the **Agentic Cinema — Grafana track**. It uses Google Agent Development Kit (ADK), Gemini on Vertex AI, and the official Grafana MCP runtime to correlate render-farm alerts, GPU metrics, Loki logs, Tempo traces, and dashboard context. The result is not another alert: it is an evidence-backed, human-approved canary rerender plan.
+
+**Live demo:** <https://renderops-director-w6mw3t2ita-uc.a.run.app>
+
+The public deployment currently runs the clearly labelled deterministic demo dataset. The same container includes Google ADK and official `mcp-grafana`; live mode is enabled only after a least-privilege Grafana service-account token is attached through Secret Manager.
+
+## Outcome
+
+When a shot starts missing its production deadline, the agent answers:
+
+- Which frames and render passes failed?
+- What evidence identifies the root cause?
+- Is a full rerender necessary?
+- What is the projected delivery delay?
+- What bounded canary should run first, and who must approve it?
+
+The project is intentionally focused on **pre-release VFX/render production**, not streaming or premiere operations.
+
+## Architecture
+
+```text
+Operator → FastAPI UI → Google ADK Runner → Gemini on Vertex AI
+                                      ↘ ADK McpToolset
+                                        ↙             ↘
+                    Hosted Grafana MCP (OAuth)   OSS mcp-grafana (stdio)
+                                        ↓
+                     Prometheus · Loki · Tempo · Alerts · Dashboards
+                                        ↓
+                    Evidence → diagnosis → recovery options → human gate
+```
+
+See [docs/architecture.md](docs/architecture.md) for the Mermaid diagram.
+
+## Runtime modes
+
+| Mode | Purpose | Data boundary |
+| --- | --- | --- |
+| `demo` | Public, credential-free product demonstration | Clearly labelled deterministic fictional telemetry |
+| `live` + `remote` | Local interactive development | Hosted Grafana Cloud MCP, Streamable HTTP, OAuth 2.1 |
+| `live` + `stdio` | Unattended Cloud Run | Official `mcp-grafana` binary and service-account token |
+
+Only read tools are exposed. Grafana write operations and render-farm mutations are outside the MVP safety boundary.
+
+## Run locally
+
+Requirements: Python 3.11+.
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+uvicorn app.main:app --reload
+```
+
+Open <http://localhost:8000>.
+
+## Connect hosted Grafana Cloud MCP
+
+```bash
+export RENDEROPS_MODE=live
+export GRAFANA_MCP_TRANSPORT=remote
+export GRAFANA_URL=https://YOUR-STACK.grafana.net
+export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
+export GOOGLE_CLOUD_LOCATION=us-central1
+export GOOGLE_GENAI_USE_VERTEXAI=true
+gcloud auth application-default login
+uvicorn app.main:app --reload
+```
+
+The first MCP request opens Grafana OAuth authorization. Grant read-only access.
+
+## Connect unattended Grafana MCP
+
+The Docker image includes official `mcp-grafana` v1.3.0. Store the token in Google Secret Manager; never put it in `.env.example`, source code, or deployment logs.
+
+```bash
+export RENDEROPS_MODE=live
+export GRAFANA_MCP_TRANSPORT=stdio
+export GRAFANA_URL=https://YOUR-STACK.grafana.net
+export GRAFANA_SERVICE_ACCOUNT_TOKEN='set-from-secret-manager'
+uvicorn app.main:app
+```
+
+## Verify
+
+```bash
+python -m ruff check .
+python -m pytest
+python -m compileall app
+docker build -t renderops-director:test .
+```
+
+## Deploy to Google Cloud Run
+
+```bash
+./scripts/bootstrap-gcp.sh
+./scripts/deploy.sh
+```
+
+The initial deployment uses safe demo mode. Switch to live stdio mode only after creating a least-privilege Grafana service account and Secret Manager entry.
+
+## Required technologies
+
+- Google Agent Development Kit (`google-adk`)
+- Gemini via Vertex AI (`google-genai`)
+- Official Grafana MCP via `McpToolset`
+- Grafana Cloud: Prometheus-compatible metrics, Loki, Tempo, alerts, dashboards
+- Google Cloud Run
+
+## Official references
+
+- [Agentic Cinema Grafana resources](https://agentic-cinema.devpost.com/details/grafana-resources)
+- [ADK Grafana Cloud integration](https://github.com/google/adk-docs/blob/main/docs/integrations/grafana-cloud.md)
+- [Grafana Cloud MCP](https://grafana.com/docs/grafana-cloud/ai-tools/mcp-servers/cloud-mcp/)
+- [Official mcp-grafana](https://github.com/grafana/mcp-grafana)
+- [ADK deployment to Cloud Run](https://google.github.io/adk-docs/deploy/cloud-run/)
+
+## License
+
+MIT © 2026 Aleksei Chirkunov

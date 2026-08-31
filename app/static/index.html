@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b12">
+  <title>RenderOps Director</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="grain"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="RenderOps Director home">
+      <span class="brand-mark">R</span>
+      <span><strong>RenderOps</strong><small>DIRECTOR</small></span>
+    </a>
+    <div class="runtime"><span class="pulse"></span><span id="runtimeLabel">Checking runtime</span></div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">GEMINI × GRAFANA MCP · PRODUCTION INTELLIGENCE</div>
+      <h1>Get the shot back<br><em>before the deadline moves.</em></h1>
+      <p>RenderOps Director correlates alerts, GPU metrics, renderer logs, and traces into one human-approved recovery decision.</p>
+    </section>
+
+    <section class="mission-panel">
+      <form id="investigationForm">
+        <label>
+          <span>SHOT ID</span>
+          <input id="shotId" name="shotId" value="SH-042" maxlength="64" required>
+        </label>
+        <label class="objective">
+          <span>MISSION</span>
+          <input id="objective" name="objective" value="Find the failure and propose the safest recovery before editorial review." minlength="10" maxlength="500" required>
+        </label>
+        <button id="runButton" type="submit"><span>Investigate shot</span><b>→</b></button>
+      </form>
+    </section>
+
+    <section id="progress" class="progress hidden" aria-live="polite">
+      <div class="progress-head"><span>AGENT INVESTIGATION</span><strong id="progressLabel">Connecting to Grafana</strong></div>
+      <div class="progress-track"><i id="progressBar"></i></div>
+      <div class="steps">
+        <span data-step="0">Alert</span><span data-step="1">Metrics</span><span data-step="2">Logs</span><span data-step="3">Traces</span><span data-step="4">Decision</span>
+      </div>
+    </section>
+
+    <section id="result" class="result hidden" aria-live="polite">
+      <div class="result-heading">
+        <div><span id="severity" class="severity">CRITICAL</span><span id="resultShot">SH-042</span></div>
+        <div class="confidence"><small>CONFIDENCE</small><strong id="confidence">93%</strong></div>
+      </div>
+      <h2 id="headline"></h2>
+      <p id="diagnosis" class="diagnosis"></p>
+
+      <div class="metric-strip">
+        <div><small>DELIVERY RISK</small><strong id="deliveryRisk">42 min</strong></div>
+        <div><small>RUNTIME</small><strong id="runtimeMode">Demo</strong></div>
+        <div><small>HUMAN GATE</small><strong id="approval">Required</strong></div>
+      </div>
+
+      <div class="content-grid">
+        <article>
+          <div class="section-title"><span>01</span><h3>Evidence chain</h3></div>
+          <div id="evidence" class="evidence-list"></div>
+        </article>
+        <article>
+          <div class="section-title"><span>02</span><h3>Recovery decision</h3></div>
+          <div id="recovery" class="recovery-list"></div>
+        </article>
+      </div>
+
+      <div class="director-note">
+        <span>DIRECTOR'S CALL</span>
+        <p id="narrative"></p>
+      </div>
+      <details>
+        <summary>Runtime evidence</summary>
+        <ul id="tools"></ul>
+      </details>
+    </section>
+
+    <section id="error" class="error hidden" role="alert"></section>
+  </main>
+
+  <footer><span>Built for Agentic Cinema · Grafana Track</span><span>Observe → Diagnose → Decide → Approve</span></footer>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
