@@ -19,6 +19,7 @@ const canaryStep = document.querySelector('#canaryStep');
 const recoveryStep = document.querySelector('#recoveryStep');
 const canaryTab = document.querySelector('#canaryTab');
 const recoveredTab = document.querySelector('#recoveredTab');
+const continueWorkflowButton = document.querySelector('#continueWorkflowButton');
 const videoToggle = document.querySelector('#videoToggle');
 const videoTrack = document.querySelector('#videoTrack');
 const videoProgress = document.querySelector('#videoProgress');
@@ -95,6 +96,15 @@ function updateVideoTransport() {
   const failureActive = activePreviewMode === 'failed'
     && failedWindows.some(([start, end]) => current >= start && current <= end);
   artifactIndicator.classList.toggle('hidden', !failureActive);
+}
+
+function focusShotPreview() {
+  const scroll = () => {
+    document.querySelector('#shotPreview').scrollIntoView({behavior: 'smooth', block: 'start'});
+  };
+  if (shotVideo.readyState >= 1) scroll();
+  else shotVideo.addEventListener('loadedmetadata', scroll, {once: true});
+  setTimeout(scroll, 850);
 }
 
 function toggleVideoPlayback() {
@@ -193,6 +203,7 @@ function resetRecoveryWorkflow() {
   approveRecoveryButton.textContent = 'Approve 38 frames';
   canaryTab.disabled = true;
   canaryTab.classList.add('hidden');
+  continueWorkflowButton.classList.add('hidden');
   recoveredTab.disabled = true;
   recoveredTab.classList.add('locked', 'hidden');
 }
@@ -244,6 +255,7 @@ async function runRecoveryPhase(phase) {
       step.querySelector('p').textContent = 'Review the Grafana checks before retrying';
       actionButton.disabled = false;
       actionButton.textContent = isCanary ? 'Retry canary' : 'Retry recovery';
+      phaseVerification.scrollIntoView({behavior: 'smooth', block: 'center'});
       return;
     }
     step.className = 'workflow-step validated';
@@ -253,18 +265,22 @@ async function runRecoveryPhase(phase) {
     if (isCanary) {
       canaryTab.disabled = false;
       canaryTab.classList.remove('hidden');
+      continueWorkflowButton.classList.remove('hidden');
       setPreviewMode('canary');
       recoveryStep.className = 'workflow-step ready';
       recoveryStep.querySelector('strong').textContent = 'Awaiting approval';
       recoveryStep.querySelector('p').textContent = 'Rerender only the 38 failed frames';
       approveRecoveryButton.disabled = false;
     } else {
+      canaryTab.disabled = true;
+      canaryTab.classList.add('hidden');
+      continueWorkflowButton.classList.add('hidden');
       recoveredTab.disabled = false;
       recoveredTab.classList.remove('locked', 'hidden');
       setPreviewMode('recovered');
       document.querySelector('#approval').textContent = 'Completed';
     }
-    phaseVerification.scrollIntoView({behavior: 'smooth', block: 'center'});
+    focusShotPreview();
   } catch (error) {
     step.className = 'workflow-step ready';
     actionButton.disabled = false;
@@ -327,6 +343,9 @@ previewTabs.forEach(tab => {
 });
 
 document.querySelector('#previewFixButton').addEventListener('click', () => {
+  recoveryWorkflow.scrollIntoView({behavior: 'smooth', block: 'start'});
+});
+continueWorkflowButton.addEventListener('click', () => {
   recoveryWorkflow.scrollIntoView({behavior: 'smooth', block: 'start'});
 });
 

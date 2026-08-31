@@ -62,8 +62,11 @@
             <button type="button" class="preview-tab locked hidden" id="recoveredTab" data-mode="recovered" disabled>Recovered shot</button>
           </div>
           <div class="preview-caption">
-            <strong id="previewTitle">What the failure looks like</strong>
-            <p id="previewDescription">Final-denoise tiles disappear, temporal noise spikes, and several frames become unusable for editorial review.</p>
+            <div>
+              <strong id="previewTitle">What the failure looks like</strong>
+              <p id="previewDescription">Final-denoise tiles disappear, temporal noise spikes, and several frames become unusable for editorial review.</p>
+            </div>
+            <button type="button" id="continueWorkflowButton" class="preview-continue hidden">Continue to final recovery approval <b>→</b></button>
           </div>
         </div>
         <aside class="shot-context">
