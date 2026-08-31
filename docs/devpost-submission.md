@@ -26,6 +26,8 @@ An operator enters a shot ID and production objective. RenderOps Director then:
 6. compares a full rerender, failed-frame-only rerender, and five-frame canary;
 7. returns an evidence-backed recovery plan with confidence, owners, delivery risk, and explicit human approval gates.
 
+For the public SH-042 scenario, it recommends a $4.20 canary followed by a $31.70 failed-frame-only rerender: $35.90 instead of a $186.40 full rerender, avoiding $150.50 (about 81%).
+
 The public scenario uses synthetic render telemetry so anyone can reproduce it. The ingestion, Grafana storage, MCP queries, Gemini reasoning, and Cloud Run response are all live.
 
 ## How we built it

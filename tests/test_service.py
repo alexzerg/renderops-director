@@ -11,6 +11,9 @@ def test_structured_response_parses_agent_json() -> None:
       "diagnosis": "GPU memory saturation caused denoiser failures.",
       "confidence": 0.94,
       "delivery_risk_minutes": 42,
+      "recommended_cost_usd": 35.9,
+      "avoided_cost_usd": 150.5,
+      "avoided_cost_percent": 80.7,
       "evidence": [
         {"source": "metric", "title": "Failed frames", "value": "38", "signal": "critical"}
       ],
@@ -49,6 +52,9 @@ def test_normalizer_builds_structured_live_response() -> None:
         "diagnosis": "MCP evidence shows GPU memory saturation.",
         "confidence": 0.95,
         "delivery_risk_minutes": 42,
+        "recommended_cost_usd": 35.9,
+        "avoided_cost_usd": 150.5,
+        "avoided_cost_percent": 80.7,
         "evidence": [
             {
                 "source": "metric",

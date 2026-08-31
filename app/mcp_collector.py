@@ -31,21 +31,27 @@ async def collect_grafana_evidence(shot_id: str) -> tuple[list[str], list[dict[s
     loki_uid = os.environ.get("GRAFANA_LOKI_UID", "grafanacloud-logs")
     tempo_uid = os.environ.get("GRAFANA_TEMPO_UID", "grafanacloud-traces")
     normalized = shot_id.strip().upper()
-    calls = (
+    metric_queries = (
+        "render_frames_failed",
+        "render_gpu_memory_usage_percent",
+        "render_gpu_utilization_percent",
+        "render_queue_delay_minutes",
+        "render_full_rerender_cost_usd_ratio",
+        "render_failed_frames_cost_usd_ratio",
+        "render_canary_cost_usd_ratio",
+    )
+    calls = tuple(
         (
             "query_prometheus",
             {
                 "datasourceUid": prometheus_uid,
-                "expr": (
-                    "render_frames_failed or render_gpu_memory_usage_percent or "
-                    "render_gpu_utilization_percent or render_queue_delay_minutes or "
-                    "render_full_rerender_cost_usd or render_failed_frames_cost_usd or "
-                    "render_canary_cost_usd"
-                ),
+                "expr": expression,
                 "queryType": "instant",
                 "endTime": "now",
             },
-        ),
+        )
+        for expression in metric_queries
+    ) + (
         (
             "query_loki_logs",
             {

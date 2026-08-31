@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import uuid
-from contextlib import suppress
 from typing import Any
 
 from google import genai
@@ -42,6 +41,9 @@ def _fallback_response(
         diagnosis=final_text,
         confidence=0.8,
         delivery_risk_minutes=0,
+        recommended_cost_usd=0,
+        avoided_cost_usd=0,
+        avoided_cost_percent=0,
         evidence=[],
         recovery_plan=[],
         agent_narrative=final_text,
@@ -80,6 +82,95 @@ def _bounded_tool_response(value: Any) -> str:
     return rendered[:6000]
 
 
+def _metric_values(tool_evidence: list[dict[str, str]]) -> dict[str, float]:
+    values: dict[str, float] = {}
+    for item in tool_evidence:
+        if item.get("tool") != "query_prometheus":
+            continue
+        try:
+            payload = json.loads(item.get("response", "{}"))
+        except json.JSONDecodeError:
+            continue
+        for series in payload.get("data", []):
+            metric_name = series.get("metric", {}).get("__name__")
+            raw_value = series.get("value", [None, None])[1]
+            if metric_name and raw_value is not None:
+                try:
+                    values[metric_name] = float(raw_value)
+                except (TypeError, ValueError):
+                    continue
+    return values
+
+
+def _apply_economic_outcome(
+    response: InvestigationResponse,
+    tool_evidence: list[dict[str, str]],
+) -> InvestigationResponse:
+    values = _metric_values(tool_evidence)
+    full = values.get("render_full_rerender_cost_usd_ratio")
+    failed = values.get("render_failed_frames_cost_usd_ratio")
+    canary = values.get("render_canary_cost_usd_ratio")
+    if full is None or failed is None or canary is None or full <= 0:
+        return response
+    recommended = round(failed + canary, 2)
+    avoided = round(full - recommended, 2)
+    avoided_percent = round(avoided / full * 100, 1)
+    failed_frames = round(values.get("render_frames_failed", 0))
+    queue_delay = round(values.get("render_queue_delay_minutes", 0))
+    economics = EvidenceItem(
+        source="metric",
+        title="Recovery economics",
+        value=(
+            f"Canary ${canary:.2f} + failed-frame rerender ${failed:.2f} = "
+            f"${recommended:.2f}, versus ${full:.2f} full rerender."
+        ),
+        signal="healthy",
+    )
+    evidence = [item for item in response.evidence if item.title != economics.title]
+    evidence = [*evidence[:4], economics]
+    recovery_plan = [
+        RecoveryAction(
+            order=1,
+            action=f"Isolate and review the {failed_frames} failed frames without rerendering.",
+            owner="Render operator",
+            risk="low",
+            requires_approval=False,
+        ),
+        RecoveryAction(
+            order=2,
+            action=f"Run a five-frame canary for ${canary:.2f} using the safe asset configuration.",
+            owner="Lighting TD",
+            risk="medium",
+            requires_approval=True,
+        ),
+        RecoveryAction(
+            order=3,
+            action=(
+                f"If the canary passes, rerender only {failed_frames} failed frames "
+                f"for ${failed:.2f}."
+            ),
+            owner="Render supervisor",
+            risk="medium",
+            requires_approval=True,
+        ),
+    ]
+    return response.model_copy(
+        update={
+            "headline": (
+                f"Avoid full rerender: recover {response.shot_id} for "
+                f"${recommended:.2f} and save {avoided_percent:.0f}%"
+            ),
+            "delivery_risk_minutes": queue_delay or response.delivery_risk_minutes,
+            "recommended_cost_usd": recommended,
+            "avoided_cost_usd": avoided,
+            "avoided_cost_percent": avoided_percent,
+            "evidence": evidence,
+            "recovery_plan": recovery_plan,
+            "approval_required": True,
+        }
+    )
+
+
 def _normalize_from_evidence(
     final_text: str,
     shot_id: str,
@@ -101,8 +192,12 @@ Objective: {objective}
 Use ONLY facts present in the MCP function responses below. Do not invent a dashboard, alert,
 metric, log, trace, cost, duration, or cause. When signals conflict, lower confidence and say so.
 Return 3-5 concise evidence items and exactly three ordered recovery actions. The first recovery
-step must be non-mutating analysis or quarantine guidance. Any canary or rerender requires human
-approval. Use delivery risk from evidence when available; otherwise use 0.
+step must isolate or review the failed range without mutation. The second must be a five-frame
+canary requiring approval. The third must rerender only failed frames after the canary passes and
+requires approval. Use delivery risk from evidence when available; otherwise use 0. When full,
+failed-frame-only, and canary cost metrics exist, calculate recommended cost as canary plus
+failed-frame-only cost, avoided cost versus full rerender, and avoided percent. Make the headline
+state the production decision and savings, not just the technical symptom.
 
 Primary agent output, which may be incomplete:
 {final_text[:6000]}
@@ -174,6 +269,9 @@ def _collector_fallback_response(
         ),
         confidence=0.55,
         delivery_risk_minutes=0,
+        recommended_cost_usd=0,
+        avoided_cost_usd=0,
+        avoided_cost_percent=0,
         evidence=evidence[:3],
         recovery_plan=[
             RecoveryAction(
@@ -265,12 +363,6 @@ async def investigate(shot_id: str, objective: str) -> InvestigationResponse:
         LOGGER.exception(final_text)
 
     first_pass = _structured_response(final_text, shot_id, tools_used)
-    if first_pass.evidence and first_pass.recovery_plan:
-        collector_task.cancel()
-        with suppress(asyncio.CancelledError, Exception):
-            await collector_task
-        return first_pass
-
     try:
         collector_tools, collector_evidence = await asyncio.wait_for(
             collector_task,
@@ -282,10 +374,15 @@ async def investigate(shot_id: str, objective: str) -> InvestigationResponse:
     except Exception:
         LOGGER.exception("Direct MCP evidence collector failed")
 
+    if first_pass.evidence and first_pass.recovery_plan:
+        first_pass = first_pass.model_copy(
+            update={"tools_used": list(dict.fromkeys(tools_used))}
+        )
+        return _apply_economic_outcome(first_pass, tool_evidence)
     if not tool_evidence:
         return first_pass
     try:
-        return await asyncio.to_thread(
+        normalized = await asyncio.to_thread(
             _normalize_from_evidence,
             final_text,
             shot_id,
@@ -293,6 +390,8 @@ async def investigate(shot_id: str, objective: str) -> InvestigationResponse:
             tools_used,
             tool_evidence,
         )
+        return _apply_economic_outcome(normalized, tool_evidence)
     except Exception:
         LOGGER.exception("Structured Gemini normalization failed")
-        return _collector_fallback_response(shot_id, tools_used, tool_evidence)
+        fallback = _collector_fallback_response(shot_id, tools_used, tool_evidence)
+        return _apply_economic_outcome(fallback, tool_evidence)

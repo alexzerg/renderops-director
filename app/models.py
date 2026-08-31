@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class InvestigationRequest(BaseModel):
     shot_id: str = Field(default="SH-042", min_length=2, max_length=64)
     objective: str = Field(
-        default="Find the render failure, estimate delivery risk, and propose the safest recovery.",
+        default="Find the failure, compare rerender costs, and propose the safest canary.",
         min_length=10,
         max_length=500,
     )
@@ -33,6 +33,9 @@ class IncidentPayload(BaseModel):
     diagnosis: str
     confidence: float = Field(ge=0, le=1)
     delivery_risk_minutes: int = Field(ge=0)
+    recommended_cost_usd: float = Field(ge=0)
+    avoided_cost_usd: float = Field(ge=0)
+    avoided_cost_percent: float = Field(ge=0, le=100)
     evidence: list[EvidenceItem]
     recovery_plan: list[RecoveryAction]
     approval_required: bool
@@ -46,6 +49,9 @@ class InvestigationResponse(BaseModel):
     diagnosis: str
     confidence: float = Field(ge=0, le=1)
     delivery_risk_minutes: int = Field(ge=0)
+    recommended_cost_usd: float = Field(ge=0)
+    avoided_cost_usd: float = Field(ge=0)
+    avoided_cost_percent: float = Field(ge=0, le=100)
     evidence: list[EvidenceItem]
     recovery_plan: list[RecoveryAction]
     agent_narrative: str

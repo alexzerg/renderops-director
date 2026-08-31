@@ -68,7 +68,7 @@ button:disabled { filter: grayscale(.5); cursor: wait; }
 .confidence strong { display: block; margin-top: 6px; font-size: 24px; }
 .result h2 { max-width: 850px; margin: 30px 0 16px; font-size: clamp(32px, 4.6vw, 58px); line-height: 1.04; letter-spacing: -.045em; }
 .diagnosis { max-width: 900px; color: #afb4c1; line-height: 1.65; font-size: 16px; }
-.metric-strip { display: grid; grid-template-columns: repeat(3, 1fr); margin: 36px 0 48px; border-block: 1px solid var(--line); }
+.metric-strip { display: grid; grid-template-columns: repeat(4, 1fr); margin: 36px 0 48px; border-block: 1px solid var(--line); }
 .metric-strip > div { padding: 22px 0; }
 .metric-strip > div + div { border-left: 1px solid var(--line); padding-left: 24px; }
 .metric-strip small { display: block; color: var(--muted); font: 700 9px/1 ui-monospace, monospace; letter-spacing: .14em; }

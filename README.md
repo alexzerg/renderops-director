@@ -3,6 +3,8 @@
 **A Gemini production coordinator that turns failed cinematic frames into the safest, fastest, and most cost-effective recovery decision.**
 
 RenderOps Director is a new submission for the **Agentic Cinema — Grafana track**. It uses Google Agent Development Kit (ADK), Gemini on Vertex AI, and the official Grafana MCP runtime to correlate render-farm alerts, GPU metrics, Loki logs, Tempo traces, and dashboard context. The result is not another alert: it is an evidence-backed, human-approved canary rerender plan.
+For the public SH-042 scenario, the recommended path costs $35.90 instead of a $186.40 full
+rerender, avoiding $150.50 (about 81%) while protecting the editorial deadline.
 
 **Live demo:** <https://renderops-director-w6mw3t2ita-uc.a.run.app>
 

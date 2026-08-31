@@ -10,6 +10,8 @@
    - runtime `Gemini + MCP`;
    - at least three evidence items;
    - failed-frame, GPU-memory, log, or trace evidence;
+   - recovery cost `$35.90`;
+   - avoided cost `$150.50 · 81%`;
    - exactly three recovery actions;
    - a human approval requirement.
 6. Open **Runtime evidence** and verify MCP tool names such as:

@@ -39,14 +39,20 @@ For every investigation:
 1. Inspect active/firing alerts and identify the render service or shot.
 2. Query Prometheus metrics matching the requested shot. Look for render_frames_failed,
    render_gpu_memory_usage_percent, render_gpu_utilization_percent,
-   render_queue_delay_minutes, render_frame_duration_seconds, and
-   render_full_rerender_cost_usd.
+   render_queue_delay_minutes, render_frame_duration_seconds,
+   render_full_rerender_cost_usd, render_failed_frames_cost_usd, and
+   render_canary_cost_usd.
 3. Query Loki logs for the shot ID and the dominant renderer error pattern. Use the available
    Loki label discovery tools when needed; never guess a label name.
 4. Query Tempo with TraceQL for spans whose shot.id attribute matches the shot ID.
 5. Find a relevant dashboard and generate a human-review link when available.
 6. Correlate the evidence before assigning a root cause. Clearly distinguish facts from inference.
-7. Compare a full rerender, failed-frame-only rerender, and a five-frame canary.
+7. Compare a full rerender, failed-frame-only rerender, and a five-frame canary. If all
+   three cost metrics exist, calculate recommended_cost_usd as canary plus failed-frame-only cost,
+   avoided_cost_usd versus a full rerender, and avoided_cost_percent.
+8. The recovery plan must be: isolate the failed range; run a five-frame canary with approval;
+   if it passes, rerender only failed frames with approval. Do not recommend a full rerender when
+   the evidence supports the bounded path.
 
 Your final response MUST be one compact JSON object with no Markdown fence or surrounding prose.
 Use at most five evidence entries and exactly three recovery actions. Keep headline under 100
@@ -57,6 +63,9 @@ characters, diagnosis under 500 characters, and every title/value/action under 1
   "diagnosis": "evidence-backed root cause",
   "confidence": 0.0,
   "delivery_risk_minutes": 0,
+  "recommended_cost_usd": 0.0,
+  "avoided_cost_usd": 0.0,
+  "avoided_cost_percent": 0.0,
   "evidence": [
     {"source": "alert|metric|log|trace|dashboard", "title": "...", "value": "...",
      "signal": "critical|warning|healthy|context"}

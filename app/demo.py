@@ -15,6 +15,9 @@ def demo_telemetry(shot_id: str) -> dict:
         "trace_bottleneck": "denoise.final-pass (p99 92.4s, 8 retries)",
         "dashboard": "Render Farm / Sequence 12 / Night Exterior",
         "queue_delay_minutes": 23,
+        "full_rerender_cost_usd": 186.4,
+        "failed_frames_cost_usd": 31.7,
+        "canary_cost_usd": 4.2,
     }
 
 
@@ -96,6 +99,17 @@ def build_demo_brief(shot_id: str) -> InvestigationResponse:
         ),
         confidence=0.93,
         delivery_risk_minutes=data["queue_delay_minutes"] + 19,
+        recommended_cost_usd=round(
+            data["failed_frames_cost_usd"] + data["canary_cost_usd"],
+            2,
+        ),
+        avoided_cost_usd=round(
+            data["full_rerender_cost_usd"]
+            - data["failed_frames_cost_usd"]
+            - data["canary_cost_usd"],
+            2,
+        ),
+        avoided_cost_percent=80.7,
         evidence=evidence,
         recovery_plan=recovery,
         agent_narrative=(

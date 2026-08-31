@@ -35,3 +35,6 @@ def test_demo_investigation() -> None:
     assert body["runtime"] == "demo"
     assert body["approval_required"] is True
     assert body["delivery_risk_minutes"] > 0
+    assert body["recommended_cost_usd"] == 35.9
+    assert body["avoided_cost_usd"] == 150.5
+    assert body["avoided_cost_percent"] == 80.7

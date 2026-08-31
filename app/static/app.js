@@ -41,7 +41,11 @@ function renderBrief(data) {
   document.querySelector('#headline').textContent = data.headline;
   document.querySelector('#diagnosis').textContent = data.diagnosis;
   document.querySelector('#deliveryRisk').textContent = `${data.delivery_risk_minutes} min`;
-  document.querySelector('#runtimeMode').textContent = data.runtime === 'demo' ? 'Demo telemetry' : 'Gemini + MCP';
+  document.querySelector('#recommendedCost').textContent = data.recommended_cost_usd > 0
+    ? `$${data.recommended_cost_usd.toFixed(2)}` : 'See evidence';
+  document.querySelector('#avoidedCost').textContent = data.avoided_cost_usd > 0
+    ? `$${data.avoided_cost_usd.toFixed(2)} · ${Math.round(data.avoided_cost_percent)}%`
+    : 'Not calculated';
   document.querySelector('#approval').textContent = data.approval_required ? 'Required' : 'Not required';
   document.querySelector('#narrative').textContent = data.agent_narrative;
 
