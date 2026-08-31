@@ -47,8 +47,8 @@ const previewModes = {
     src: '/static/media/shot-sh042-canary.webm',
     poster: '/static/media/shot-sh042-canary.jpg',
     status: 'CANARY PASS',
-    title: 'What the proposed fix restores',
-    description: 'The five-frame canary uses the safe asset configuration, restores stable denoise output, and keeps GPU memory below the failure threshold.',
+    title: 'Same frames: failed render versus canary',
+    description: 'A synchronized side-by-side comparison shows frames 1042–1046: damaged v47 output on the left and the validated v46-safe canary on the right.',
   },
   recovered: {
     src: '/static/media/shot-sh042-recovered.webm',

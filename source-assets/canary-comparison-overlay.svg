@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720">
+ <rect width="1280" height="120" fill="#080b12"/>
+ <rect y="480" width="1280" height="240" fill="#080b12"/>
+ <rect x="26" y="32" width="188" height="54" rx="9" fill="#351018" stroke="#ff4d5e" stroke-opacity=".7"/>
+ <circle cx="53" cy="59" r="7" fill="#ff4d5e"/><text x="72" y="67" fill="#ff8a96" font-family="Arial,sans-serif" font-size="22" font-weight="700">FAILED V47</text>
+ <rect x="666" y="32" width="255" height="54" rx="9" fill="#082017" stroke="#64d98b" stroke-opacity=".7"/>
+ <circle cx="693" cy="59" r="7" fill="#64d98b"/><text x="712" y="67" fill="#7ee8a2" font-family="Arial,sans-serif" font-size="22" font-weight="700">CANARY V46-SAFE</text>
+ <line x1="640" y1="120" x2="640" y2="480" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>
+ <text x="640" y="545" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="32" font-weight="700">SAME MOMENT · FRAMES 1042–1046</text>
+ <text x="640" y="590" text-anchor="middle" fill="#a5adbe" font-family="Arial,sans-serif" font-size="20">Left: missing denoise tiles and temporal noise · Right: stable final output</text>
+ <rect x="442" y="628" width="396" height="48" rx="24" fill="#10261b" stroke="#64d98b" stroke-opacity=".55"/>
+ <text x="640" y="659" text-anchor="middle" fill="#7ee8a2" font-family="Arial,sans-serif" font-size="19" font-weight="700">5 / 5 FRAMES · VRAM 72% · VERIFIED</text>
+</svg>

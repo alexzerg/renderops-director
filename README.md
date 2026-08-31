@@ -13,8 +13,9 @@ The public deployment runs live Google ADK, Gemini on Vertex AI, and official `m
 ## Tangible shot preview
 
 The public UI includes an original synthetic VFX shot, a visibly damaged final-denoise render, a
-failed-frame timeline, and a recovered five-frame canary. Visitors can switch between all three
-media states before running the live Grafana investigation. The footage is original and generated
+failed-frame timeline, and a side-by-side canary comparison of the exact same frames. Visitors first
+see only source and failure states; the canary comparison appears after verification and the full
+recovered shot appears only after 38/38 recovery. The footage is original and generated
 procedurally for this reproducible demo; it is not third-party studio material.
 
 ## Approval-gated recovery loop
