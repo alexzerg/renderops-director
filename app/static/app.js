@@ -25,7 +25,9 @@ const videoProgress = document.querySelector('#videoProgress');
 const videoClock = document.querySelector('#videoClock');
 const previewTimecode = document.querySelector('#previewTimecode');
 const artifactIndicator = document.querySelector('#artifactIndicator');
+const comparisonLabels = document.querySelector('#comparisonLabels');
 let activePreviewMode = 'failed';
+const generatedMediaUrls = {};
 const failedWindows = [[1.2, 1.72], [3.35, 4.15], [6.1, 6.58]];
 
 const previewModes = {
@@ -75,6 +77,7 @@ function setPreviewMode(mode) {
   activePreviewMode = mode;
   videoTrack.classList.toggle('no-failures', mode !== 'failed');
   artifactIndicator.classList.add('hidden');
+  comparisonLabels.classList.toggle('hidden', mode !== 'canary');
 }
 
 function formatClock(seconds) {
@@ -162,6 +165,18 @@ function renderBrief(data) {
     .map(tool => `<li>${escapeHtml(tool)}</li>`).join('') || '<li>No tool calls were reported.</li>';
 }
 
+function installGeneratedMedia(data) {
+  if (!data.execution || !data.execution.media_base64) return;
+  const mode = data.phase === 'canary' ? 'canary' : 'recovered';
+  if (generatedMediaUrls[mode]) URL.revokeObjectURL(generatedMediaUrls[mode]);
+  const binary = atob(data.execution.media_base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  const blob = new Blob([bytes], {type: data.execution.media_mime});
+  generatedMediaUrls[mode] = URL.createObjectURL(blob);
+  previewModes[mode].src = generatedMediaUrls[mode];
+}
+
 function resetRecoveryWorkflow() {
   recoveryWorkflow.classList.add('hidden');
   phaseVerification.classList.add('hidden');
@@ -190,9 +205,12 @@ function renderPhaseVerification(data) {
   document.querySelector('#phaseGpu').textContent = `${Math.round(data.gpu_memory_before_percent)}% → ${Math.round(data.gpu_memory_after_percent)}%`;
   document.querySelector('#phaseFrames').textContent = `${data.frames_processed - data.frames_failed} / ${data.frames_processed}`;
   document.querySelector('#phaseConfidence').textContent = `${Math.round(data.confidence * 100)}%`;
+  document.querySelector('#phaseExecution').textContent = data.execution
+    ? `FFmpeg · ${data.execution.duration_ms} ms` : 'Unavailable';
   document.querySelector('#prometheusCheck').textContent = data.verification_checks[0] || 'No metric result';
   document.querySelector('#lokiCheck').textContent = data.verification_checks[1] || 'No log result';
   document.querySelector('#tempoCheck').textContent = data.verification_checks[2] || 'No trace result';
+  document.querySelector('#ffmpegCheck').textContent = data.verification_checks[3] || 'No execution result';
   document.querySelector('#phaseSummary').textContent = data.summary;
   document.querySelector('#phaseNext').textContent = data.next_action;
   const existing = [...document.querySelectorAll('#tools li')].map(item => item.textContent);
@@ -218,6 +236,7 @@ async function runRecoveryPhase(phase) {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || `${phase} verification failed`);
+    installGeneratedMedia(data);
     renderPhaseVerification(data);
     if (data.status === 'failed') {
       step.className = 'workflow-step ready';

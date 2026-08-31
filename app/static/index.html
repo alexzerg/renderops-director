@@ -44,6 +44,7 @@
             <source src="/static/media/shot-sh042-failed.mp4" type="video/mp4">
           </video>
           <div id="artifactIndicator" class="artifact-indicator hidden"><i></i> FRAME FAILURE ACTIVE</div>
+          <div id="comparisonLabels" class="comparison-labels hidden"><span>FAILED V47</span><span>CANARY V46-SAFE</span></div>
           <div class="video-transport">
             <button type="button" id="videoToggle" class="video-toggle">Pause</button>
             <div id="videoTrack" class="video-track" aria-label="Video timeline">
@@ -152,7 +153,7 @@
           <div>
             <span>APPROVAL-GATED RECOVERY</span>
             <h3>Prove the fix through Grafana.</h3>
-            <p>The render jobs are simulated; OTLP ingestion and Prometheus, Loki, and Tempo verification are live.</p>
+            <p>The failure scenario is synthetic; approved canary and recovery jobs run real FFmpeg processing, with live Grafana verification.</p>
           </div>
           <strong>GRAFANA CLOUD · LIVE</strong>
         </div>
@@ -175,11 +176,13 @@
             <div><small>GPU MEMORY</small><strong id="phaseGpu">96% → 72%</strong></div>
             <div><small>FRAMES</small><strong id="phaseFrames">5 / 5</strong></div>
             <div><small>CONFIDENCE</small><strong id="phaseConfidence">98%</strong></div>
+            <div><small>REAL JOB</small><strong id="phaseExecution">FFmpeg · exit 0</strong></div>
           </div>
           <div class="grafana-checks">
             <div><span class="grafana-dot prometheus"></span><strong>Prometheus</strong><p id="prometheusCheck"></p></div>
             <div><span class="grafana-dot loki"></span><strong>Loki</strong><p id="lokiCheck"></p></div>
             <div><span class="grafana-dot tempo"></span><strong>Tempo</strong><p id="tempoCheck"></p></div>
+            <div><span class="grafana-dot ffmpeg"></span><strong>FFmpeg</strong><p id="ffmpegCheck"></p></div>
           </div>
           <p id="phaseSummary" class="phase-summary"></p>
           <div class="phase-next"><small>NEXT ACTION</small><strong id="phaseNext"></strong></div>

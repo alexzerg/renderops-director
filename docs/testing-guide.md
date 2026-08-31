@@ -19,11 +19,12 @@
    - `5 / 5` frames;
    - GPU memory `96% → 72%`;
    - successful Prometheus, Loki, and Tempo checks;
+   - a real FFmpeg check with exit code, duration, frames, and output bytes;
    - the 38-frame recovery becomes enabled.
 8. Click **Approve 38 frames** and verify `38 / 38`, `EDITORIAL READY`, and the recovered video.
 9. Open **Runtime evidence** and verify MCP tool names such as `query_prometheus`, `query_loki_logs`, and `tempo_traceql-search`.
 
-The cinematic telemetry is synthetic and reproducible. The OTLP ingestion, Grafana Cloud storage, official MCP queries, Gemini reasoning, and HTTP response are live.
+The initial cinematic GPU failure is synthetic and reproducible. Approved canary and recovery actions run real FFmpeg processing; their output files and actual execution telemetry are then verified through Grafana Cloud and official MCP queries.
 
 ## Health endpoint
 
@@ -36,7 +37,7 @@ Expected indicators:
 ```json
 {
   "status": "ok",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "agent_runtime": "live",
   "grafana_transport": "stdio"
 }

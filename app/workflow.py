@@ -11,7 +11,8 @@ from google.genai import types
 from pydantic import ValidationError
 
 from app.mcp_collector import collect_grafana_evidence
-from app.models import PhaseNarrative, PhaseVerificationResponse
+from app.models import PhaseNarrative, PhaseVerificationResponse, RenderExecutionResult
+from app.render_executor import execute_render_fix
 from app.telemetry import SCENARIOS, seed_render_telemetry
 
 LOGGER = logging.getLogger(__name__)
@@ -88,7 +89,13 @@ async def execute_render_phase(shot_id: str, phase: str) -> PhaseVerificationRes
     if phase not in {"canary", "recovery"}:
         raise ValueError(f"Unsupported recovery phase: {phase}")
     normalized = shot_id.strip().upper()
-    seeded = await asyncio.to_thread(seed_render_telemetry, normalized, phase)
+    artifact = await asyncio.to_thread(execute_render_fix, phase)
+    seeded = await asyncio.to_thread(
+        seed_render_telemetry,
+        normalized,
+        phase,
+        artifact.telemetry(),
+    )
     await asyncio.sleep(float(os.environ.get("RENDEROPS_INGESTION_DELAY_SECONDS", "6")))
     tools, evidence = await collect_grafana_evidence(normalized, phase)
     values = _metric_values(evidence)
@@ -102,10 +109,21 @@ async def execute_render_phase(shot_id: str, phase: str) -> PhaseVerificationRes
     log_verified = expected_log in _tool_text(evidence, "query_loki_logs")
     trace_text = _tool_text(evidence, "tempo_traceql-search")
     trace_verified = len(trace_text) > 20 and "trace" in trace_text.lower()
+    execution_exit = round(values.get("render_job_exit_code", -1))
+    execution_frames = round(values.get("render_job_frames_processed", -1))
+    execution_duration = round(values.get("render_job_duration_milliseconds", -1))
+    execution_verified = (
+        artifact.exit_code == 0
+        and artifact.frames_processed == scenario["frames_total"]
+        and execution_exit == 0
+        and execution_frames == artifact.frames_processed
+        and execution_duration >= 0
+    )
     metrics_verified = (
         frames_total == scenario["frames_total"]
         and frames_failed == 0
         and 0 <= gpu_memory < 85
+        and execution_verified
     )
     verified = metrics_verified and log_verified and trace_verified
     checks = [
@@ -115,6 +133,10 @@ async def execute_render_phase(shot_id: str, phase: str) -> PhaseVerificationRes
         ),
         f"Loki: {'success log found' if log_verified else 'success log missing'}",
         f"Tempo: {'successful trace found' if trace_verified else 'trace missing'}",
+        (
+            f"FFmpeg: exit {artifact.exit_code}, {artifact.frames_processed} frames, "
+            f"{artifact.duration_ms} ms, {artifact.output_bytes} bytes"
+        ),
     ]
     if phase == "canary":
         headline = "Canary validated by Grafana" if verified else "Canary verification failed"
@@ -186,11 +208,22 @@ async def execute_render_phase(shot_id: str, phase: str) -> PhaseVerificationRes
         tools_used=list(
             dict.fromkeys(
                 [
+                    "ffmpeg_render",
                     f"otlp_seed({phase}:{delivered})",
                     *tools,
                     "mcp_phase_verification",
                 ]
             )
+        ),
+        execution=RenderExecutionResult(
+            executor="ffmpeg",
+            exit_code=artifact.exit_code,
+            duration_ms=artifact.duration_ms,
+            frames_processed=artifact.frames_processed,
+            output_bytes=artifact.output_bytes,
+            sha256=artifact.sha256,
+            media_mime="video/webm",
+            media_base64=artifact.media_base64,
         ),
         approval_required=phase == "canary" and verified,
     )

@@ -105,6 +105,7 @@ def _export_metrics(
     headers: dict[str, str],
     shot_id: str,
     phase: str,
+    execution: dict[str, int | str] | None = None,
 ) -> bool:
     data = _scenario(phase)
     exporter = OTLPMetricExporter(endpoint=f"{endpoint}/v1/metrics", headers=headers)
@@ -123,6 +124,18 @@ def _export_metrics(
         "render_failed_frames_cost_usd": (31.7, "1"),
         "render_canary_cost_usd": (4.2, "1"),
     }
+    if execution:
+        samples.update(
+            {
+                "render_job_exit_code": (int(execution["exit_code"]), ""),
+                "render_job_duration": (int(execution["duration_ms"]), "ms"),
+                "render_job_output": (int(execution["output_bytes"]), "By"),
+                "render_job_frames_processed": (
+                    int(execution["frames_processed"]),
+                    "frames",
+                ),
+            }
+        )
     for name, (value, unit) in samples.items():
         meter.create_gauge(name, unit=unit).set(value, labels)
     result = provider.force_flush(timeout_millis=20_000)
@@ -135,6 +148,7 @@ def _export_logs(
     headers: dict[str, str],
     shot_id: str,
     phase: str,
+    execution: dict[str, int | str] | None = None,
 ) -> bool:
     data = _scenario(phase)
     exporter = OTLPLogExporter(endpoint=f"{endpoint}/v1/logs", headers=headers)
@@ -149,6 +163,14 @@ def _export_logs(
         **_labels(shot_id, phase, data),
         "worker_pool": "gpu-a10-west",
     }
+    if execution:
+        logger.info(
+            "FFmpeg %s render completed with exit code %s in %s milliseconds",
+            phase,
+            execution["exit_code"],
+            execution["duration_ms"],
+            extra={**common, **execution},
+        )
     if phase == "failure":
         logger.info("Render batch accepted: 240 frames for editorial review", extra=common)
         for frame in (1042, 1047, 1051, 1063):
@@ -189,6 +211,7 @@ def _export_traces(
     headers: dict[str, str],
     shot_id: str,
     phase: str,
+    execution: dict[str, int | str] | None = None,
 ) -> bool:
     data = _scenario(phase)
     exporter = OTLPSpanExporter(endpoint=f"{endpoint}/v1/traces", headers=headers)
@@ -200,6 +223,12 @@ def _export_traces(
         shot_span.set_attribute("recovery.phase", phase)
         shot_span.set_attribute("render.frames.total", data["frames_total"])
         shot_span.set_attribute("render.frames.failed", data["frames_failed"])
+        if execution:
+            shot_span.set_attribute("render.executor", str(execution["executor"]))
+            shot_span.set_attribute("render.exit_code", int(execution["exit_code"]))
+            shot_span.set_attribute("render.actual_duration_ms", int(execution["duration_ms"]))
+            shot_span.set_attribute("render.output_bytes", int(execution["output_bytes"]))
+            shot_span.set_attribute("render.output_sha256", str(execution["sha256"]))
         with tracer.start_as_current_span("render.frame") as frame_span:
             frame_span.set_attribute("shot.id", shot_id)
             frame_span.set_attribute("recovery.phase", phase)
@@ -235,15 +264,19 @@ def _export_traces(
     return result
 
 
-def seed_render_telemetry(shot_id: str, phase: str = "failure") -> dict[str, object]:
-    """Export a bounded evidence set and return only non-sensitive delivery metadata."""
+def seed_render_telemetry(
+    shot_id: str,
+    phase: str = "failure",
+    execution: dict[str, int | str] | None = None,
+) -> dict[str, object]:
+    """Export render evidence and optional real execution metadata."""
     normalized = shot_id.strip().upper()
     _scenario(phase)
     endpoint, headers = _otlp_config()
     started = time.monotonic()
-    metrics_ok = _export_metrics(endpoint, headers, normalized, phase)
-    logs_ok = _export_logs(endpoint, headers, normalized, phase)
-    traces_ok = _export_traces(endpoint, headers, normalized, phase)
+    metrics_ok = _export_metrics(endpoint, headers, normalized, phase, execution)
+    logs_ok = _export_logs(endpoint, headers, normalized, phase, execution)
+    traces_ok = _export_traces(endpoint, headers, normalized, phase, execution)
     return {
         "shot_id": normalized,
         "phase": phase,

@@ -8,3 +8,4 @@
 | Where is the critical path? | Tempo span and event | `tempo_traceql-search` | failed denoiser span with eight retries |
 | What are the recovery economics? | Cost metrics | `query_prometheus` | full rerender vs failed frames vs canary |
 | Can automation mutate production? | MCP startup and allowlist | runtime policy | `--disable-write`, human gate required |
+| Did the approved fix actually run? | FFmpeg execution metrics and logs | `query_prometheus` + `query_loki_logs` | exit code, duration, frames processed, output bytes, and new media SHA-256 |

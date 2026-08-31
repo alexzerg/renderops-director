@@ -3,7 +3,9 @@
 ```mermaid
 flowchart LR
   O[Render Supervisor] -->|Shot + deadline objective| UI[FastAPI Operator Console]
-  UI --> S[Bounded OpenTelemetry scenario]
+  UI --> X[FFmpeg canary + recovery executor]
+  X --> M[New WebM media output]
+  X --> S[OpenTelemetry execution evidence]
   S -->|OTLP metrics + logs + traces| GC[Grafana Cloud]
   UI --> R[Google ADK Runner]
   R --> G[Gemini on Vertex AI]

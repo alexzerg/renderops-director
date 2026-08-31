@@ -69,6 +69,17 @@ class PhaseNarrative(BaseModel):
     confidence: float = Field(ge=0, le=1)
 
 
+class RenderExecutionResult(BaseModel):
+    executor: Literal["ffmpeg"]
+    exit_code: int
+    duration_ms: int = Field(ge=0)
+    frames_processed: int = Field(ge=0)
+    output_bytes: int = Field(ge=0)
+    sha256: str
+    media_mime: Literal["video/webm"]
+    media_base64: str
+
+
 class PhaseVerificationResponse(BaseModel):
     shot_id: str
     phase: Literal["canary", "recovery"]
@@ -83,4 +94,5 @@ class PhaseVerificationResponse(BaseModel):
     next_action: str
     confidence: float = Field(ge=0, le=1)
     tools_used: list[str]
+    execution: RenderExecutionResult | None = None
     approval_required: bool

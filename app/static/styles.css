@@ -195,11 +195,11 @@ footer { display: flex; justify-content: space-between; padding: 40px 0 32px; bo
 .phase-result-head { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
 .phase-result-head span { padding: 7px 9px; color: var(--green); border: 1px solid rgba(100,217,139,.4); font: 800 9px/1 ui-monospace,monospace; letter-spacing: .12em; }
 .phase-result-head strong { font-size: 18px; }
-.verification-kpis { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 20px; border-block: 1px solid var(--line); }
+.verification-kpis { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 20px; border-block: 1px solid var(--line); }
 .verification-kpis > div { padding: 17px 0; }.verification-kpis > div+div { padding-left: 20px; border-left: 1px solid var(--line); }
 .verification-kpis small,.phase-next small { display: block; color: var(--muted); font: 700 8px/1 ui-monospace,monospace; letter-spacing: .12em; }
 .verification-kpis strong { display: block; margin-top: 7px; font-size: 18px; }
-.grafana-checks { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin-top: 18px; }
+.grafana-checks { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; margin-top: 18px; }
 .grafana-checks > div { position: relative; padding: 16px 14px 14px 36px; border: 1px solid var(--line); background: rgba(14,19,29,.8); }
 .grafana-checks strong { font-size: 12px; }.grafana-checks p { margin: 6px 0 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
 .grafana-dot { position: absolute; top: 19px; left: 16px; width: 8px; height: 8px; border-radius: 50%; }.grafana-dot.prometheus { background: #f15b2a; }.grafana-dot.loki { background: #eab308; }.grafana-dot.tempo { background: #8b5cf6; }
@@ -219,3 +219,7 @@ footer { display: flex; justify-content: space-between; padding: 40px 0 32px; bo
 .video-track.no-failures .failure-window { display: none; }
 #videoClock { color: #8d94a7; font: 650 9px/1 ui-monospace,monospace; text-align: right; }
 @media(max-width:540px){.video-transport{grid-template-columns:60px 1fr 72px;padding:0 9px;gap:8px}.video-toggle{font-size:8px}}
+.grafana-dot.ffmpeg { background: #57d4d4; }
+.comparison-labels { position: absolute; z-index: 3; top: 94px; left: 14px; right: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; pointer-events: none; }
+.comparison-labels span { justify-self: start; padding: 8px 10px; color: #ff8a96; background: rgba(53,16,24,.88); border: 1px solid rgba(255,77,94,.55); font: 800 9px/1 ui-monospace,monospace; letter-spacing: .1em; }
+.comparison-labels span:last-child { justify-self: end; color: #7ee8a2; background: rgba(8,32,23,.88); border-color: rgba(100,217,139,.55); }

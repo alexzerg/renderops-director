@@ -6,6 +6,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8080
 WORKDIR /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 COPY --from=grafana-mcp /go/bin/mcp-grafana /usr/local/bin/mcp-grafana
 COPY pyproject.toml README.md LICENSE ./
 COPY app ./app

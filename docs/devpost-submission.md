@@ -33,7 +33,7 @@ An operator then enters a shot ID and production objective. RenderOps Director:
 
 For the public SH-042 scenario, it recommends a $4.20 canary followed by a $31.70 failed-frame-only rerender: $35.90 instead of a $186.40 full rerender, avoiding $150.50 (about 81%).
 
-The public scenario uses synthetic render telemetry so anyone can reproduce it. The ingestion, Grafana storage, MCP queries, Gemini reasoning, and Cloud Run response are all live.
+The initial GPU failure is a reproducible synthetic scenario. After approval, canary and recovery actions execute real FFmpeg processing inside Cloud Run, return newly generated media, and export actual execution telemetry for live Grafana and Gemini verification.
 
 ## How we built it
 

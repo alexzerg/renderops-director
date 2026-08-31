@@ -33,7 +33,7 @@
     <rect x="405" y="235" width="480" height="450" rx="24" class="group"/>
     <text x="435" y="278" class="num">02</text><text x="475" y="278" class="h">Google Cloud agent runtime</text>
     <rect x="435" y="315" width="195" height="108" rx="16" class="node"/>
-    <text x="460" y="350" class="h">Cloud Run</text><text x="460" y="378" class="p">Scale-to-zero service</text><text x="460" y="399" class="p">Secrets injected at runtime</text>
+    <text x="460" y="350" class="h">Cloud Run</text><text x="460" y="378" class="p">FastAPI + FFmpeg executor</text><text x="460" y="399" class="p">Scale-to-zero · secrets</text>
     <rect x="660" y="315" width="195" height="108" rx="16" class="node2"/>
     <text x="685" y="350" class="h">OpenTelemetry</text><text x="685" y="378" class="p">Metrics · logs · traces</text><text x="685" y="399" class="p">Bounded shot scenario</text>
     <rect x="435" y="458" width="195" height="116" rx="16" class="node2"/>

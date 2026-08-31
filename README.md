@@ -25,8 +25,10 @@ render phase through Grafana Cloud OTLP, then verifies the result through Promet
 MCP calls. Only a validated canary unlocks the 38-frame recovery. A second live verification marks
 the final shot editorial ready and unlocks the recovered media preview.
 
-The render jobs are simulated for reproducibility; the telemetry ingestion, Grafana storage, MCP
-queries, Gemini verification narrative, approval gates, and UI state transitions are live.
+The initial GPU failure scenario is synthetic for reproducibility. Approved canary and recovery
+actions execute real FFmpeg media processing inside Cloud Run, return newly generated WebM files to
+the browser, and export actual exit code, duration, frame count, output size, logs, and traces for
+live Grafana verification.
 
 ## Outcome
 

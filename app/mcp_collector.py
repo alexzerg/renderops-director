@@ -51,6 +51,15 @@ async def collect_grafana_evidence(
                 "render_canary_cost_usd_ratio",
             ]
         )
+    else:
+        metric_names.extend(
+            [
+                "render_job_exit_code",
+                "render_job_duration_milliseconds",
+                "render_job_output_bytes",
+                "render_job_frames_processed",
+            ]
+        )
     metric_queries = [
         f'{name}{{recovery_phase="{phase}"}}'
         for name in metric_names
