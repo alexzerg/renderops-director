@@ -22,18 +22,13 @@ The project is intentionally focused on **pre-release VFX/render production**, n
 
 ## Architecture
 
-```text
-Operator → FastAPI UI → Google ADK Runner → Gemini on Vertex AI
-                                      ↘ ADK McpToolset
-                                        ↙             ↘
-                    Hosted Grafana MCP (OAuth)   OSS mcp-grafana (stdio)
-                                        ↓
-                     Prometheus · Loki · Tempo · Alerts · Dashboards
-                                        ↓
-                    Evidence → diagnosis → recovery options → human gate
-```
+![RenderOps Director architecture](docs/architecture.png)
 
-See [docs/architecture.md](docs/architecture.md) for the Mermaid diagram.
+The public path is fully live: a bounded cinematic scenario is exported through Grafana Cloud OTLP,
+stored in Prometheus/Loki/Tempo, read back through the official Grafana MCP server, correlated by a
+Google ADK agent using Gemini on Vertex AI, and returned as a human-approved recovery decision.
+
+See the editable [SVG](docs/architecture.svg) and [architecture notes](docs/architecture.md).
 
 ## Runtime modes
 
@@ -116,7 +111,21 @@ docker build -t renderops-director:test .
 ./scripts/deploy.sh
 ```
 
-The initial deployment uses safe demo mode. Switch to live stdio mode only after creating a least-privilege Grafana service account and Secret Manager entry.
+Deployment defaults to credential-free demo mode. Set the documented live environment variables and
+Secret Manager entries to reproduce the public Gemini + Grafana MCP configuration.
+
+## Submission assets
+
+- [Devpost submission copy](docs/devpost-submission.md)
+
+- [Judge testing guide](docs/testing-guide.md)
+- [Grafana evidence map](docs/grafana-evidence.md)
+- [Architecture PNG](docs/architecture.png) and [SVG](docs/architecture.svg)
+- [Production UI screenshot](docs/production-live.png)
+
+## Production screenshot
+
+![RenderOps Director live investigation](docs/production-live.png)
 
 ## Required technologies
 
