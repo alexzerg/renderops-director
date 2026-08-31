@@ -17,6 +17,7 @@ const approveCanaryButton = document.querySelector('#approveCanaryButton');
 const approveRecoveryButton = document.querySelector('#approveRecoveryButton');
 const canaryStep = document.querySelector('#canaryStep');
 const recoveryStep = document.querySelector('#recoveryStep');
+const canaryTab = document.querySelector('#canaryTab');
 const recoveredTab = document.querySelector('#recoveredTab');
 
 const previewModes = {
@@ -142,8 +143,10 @@ function resetRecoveryWorkflow() {
   recoveryStep.querySelector('p').textContent = 'Requires a Grafana-validated canary';
   approveRecoveryButton.disabled = true;
   approveRecoveryButton.textContent = 'Approve 38 frames';
+  canaryTab.disabled = true;
+  canaryTab.classList.add('hidden');
   recoveredTab.disabled = true;
-  recoveredTab.classList.add('locked');
+  recoveredTab.classList.add('locked', 'hidden');
 }
 
 function renderPhaseVerification(data) {
@@ -196,6 +199,8 @@ async function runRecoveryPhase(phase) {
     step.querySelector('p').textContent = isCanary ? '0 failures · VRAM 72% · trace passed' : 'Shot verified and editorial ready';
     actionButton.textContent = isCanary ? 'Validated ✓' : 'Completed ✓';
     if (isCanary) {
+      canaryTab.disabled = false;
+      canaryTab.classList.remove('hidden');
       setPreviewMode('canary');
       recoveryStep.className = 'workflow-step ready';
       recoveryStep.querySelector('strong').textContent = 'Awaiting approval';
@@ -203,7 +208,7 @@ async function runRecoveryPhase(phase) {
       approveRecoveryButton.disabled = false;
     } else {
       recoveredTab.disabled = false;
-      recoveredTab.classList.remove('locked');
+      recoveredTab.classList.remove('locked', 'hidden');
       setPreviewMode('recovered');
       document.querySelector('#approval').textContent = 'Completed';
     }
@@ -270,8 +275,7 @@ previewTabs.forEach(tab => {
 });
 
 document.querySelector('#previewFixButton').addEventListener('click', () => {
-  setPreviewMode('canary');
-  document.querySelector('#shotPreview').scrollIntoView({behavior: 'smooth', block: 'start'});
+  recoveryWorkflow.scrollIntoView({behavior: 'smooth', block: 'start'});
 });
 
 approveCanaryButton.addEventListener('click', () => runRecoveryPhase('canary'));

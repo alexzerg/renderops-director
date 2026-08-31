@@ -46,8 +46,8 @@
           <div class="preview-tabs" role="tablist" aria-label="Shot preview mode">
             <button type="button" class="preview-tab" data-mode="source">Original plate</button>
             <button type="button" class="preview-tab active" data-mode="failed">Failed render</button>
-            <button type="button" class="preview-tab" data-mode="canary">Canary fix</button>
-            <button type="button" class="preview-tab locked" id="recoveredTab" data-mode="recovered" disabled>Recovered shot</button>
+            <button type="button" class="preview-tab hidden" id="canaryTab" data-mode="canary" disabled>Canary fix</button>
+            <button type="button" class="preview-tab locked hidden" id="recoveredTab" data-mode="recovered" disabled>Recovered shot</button>
           </div>
           <div class="preview-caption">
             <strong id="previewTitle">What the failure looks like</strong>
@@ -134,7 +134,7 @@
           <span>DIRECTOR'S CALL</span>
           <p id="narrative"></p>
         </div>
-        <button type="button" id="previewFixButton" class="preview-fix-button">Watch proposed canary <b>→</b></button>
+        <button type="button" id="previewFixButton" class="preview-fix-button">Continue to canary approval <b>→</b></button>
       </div>
       <section id="recoveryWorkflow" class="recovery-workflow hidden">
         <div class="workflow-heading">

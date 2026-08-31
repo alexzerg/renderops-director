@@ -1,6 +1,6 @@
 [project]
 name = "renderops-director"
-version = "0.6.0"
+version = "0.6.1"
 description = "Gemini production agent for cinematic render-pipeline incidents using Grafana MCP"
 readme = "README.md"
 requires-python = ">=3.11"
